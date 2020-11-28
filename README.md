@@ -1,6 +1,6 @@
-## Mujin coading Interview
+# Mujin coading Interview
 
-# Improvements in the code as discussed yesterday
+### Improvements in the code as discussed yesterday
 1. I did review the libraries and made sure to add limited libraries. Made sure that I include the libraries only once.
 2. Used Memozition for identifying previously executed task and used that information to run the program faster
 3. Used recursion depth to detect infinity. 
@@ -15,7 +15,7 @@
 9. structured code in a better way
 10. Now code can detect infinities based on the logic in #3
 
-# Things to improve
+### Things to improve
 1. As there are 2 kinds of infinities, one due to robot moving in grid infinitly and unable to get out side of the loop or finish the given program, and the second one recursion by construction example: A = AAA is a recursion. Current program can detect some basic such cases but can't completley detect all such cases. This leads to segmentation faults.
 Example of cases currently code can detect: A = AAAA, A = mAlmA, A = ub(mAm), A = ib(mAm)(lmAl) etc
 Cases that lead to segmentation fault: A = ib(mAm)() etc which are not a definite cases. These cases can be recursive or not recursive depending on the heading they start, if conditions. Current program fail to detect such cases and lead to Segmentation fault. 
@@ -23,7 +23,7 @@ Cases that lead to segmentation fault: A = ib(mAm)() etc which are not a definit
 
 
 
-# Instructions to compile and run
+### Instructions to compile and run
 ```
 Go to PATH_to_mujin/
 mkdir build
@@ -34,7 +34,7 @@ make
 ```
 then enter the information of the test
 
-# Example test input
+#### Example test input
 ```
 4 8 4 6
 .......#
@@ -58,7 +58,7 @@ H
 2 2 s
 I
 ```
-#  output
+####  output
 ```
 1 1 w
 inf
