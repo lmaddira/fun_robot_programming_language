@@ -89,23 +89,23 @@ void Environment::execute_if_clause(int &n,string &s, int &i) // this function i
     // check the case
     switch(c) // if barrier,n,e,s,w
     {
-        case 'b':
+        case barrier:
             if(r.isbarrier(grid)) execute_procedure(--n,conditions[0]);
             else execute_procedure(--n, conditions[1]);
             break;
-        case 'n':
+        case north:
             if(r.get_current_heading() == 0) execute_procedure(--n, conditions[0]); //if true execute 1st condition else 2nd condition
             else execute_procedure(--n, conditions[1]);
             break;
-        case 'e':
+        case east:
             if(r.get_current_heading() == 3) execute_procedure(--n, conditions[0]);
             else execute_procedure(--n, conditions[1]);
             break;
-        case 'w':
+        case west:
             if(r.get_current_heading() == 1) execute_procedure(--n, conditions[0]);
             else execute_procedure(--n, conditions[1]);
             break;
-        case 's':
+        case south:
             if(r.get_current_heading() == 2) execute_procedure(--n, conditions[0]);
             else execute_procedure(--n, conditions[1]);
             break;
@@ -125,7 +125,7 @@ void Environment::execute_until_clause(int &n,string &s, int &i) // this functio
     get_until_clause(s,condition, ++i); 
     switch(c) // if barrier,n,e,s,w
     {
-        case 'b':
+        case barrier:
             while(n > 0 && !r.isbarrier(grid)) execute_procedure(--n, condition); // until this condition is true execute the procedure 
             break;
         case north:

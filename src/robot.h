@@ -4,7 +4,8 @@
 #include <stack>
 
 using namespace std;
-#define blocked '#'
+#define blocked '#' 
+#define barrier 'b'
 
 /* enum of direction of the robot */
 enum Heading{north = 'n' ,west = 'w',south = 's',east = 'e'};
