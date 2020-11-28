@@ -36,15 +36,16 @@ int main()
     }
     /* for each query intitiate robot position for the task 
         execute the procedure and returns the final position of the robot after the procedure */
+
     for(int i=0;i<q;++i)
     {
         auto start = std::chrono::high_resolution_clock::now();
         env.initiate_robot(x[i],y[i],h[i]);
-        int recursion_depth = 2000000;
+        int recursion_depth = 200000;
         string result = env.execute_procedure(recursion_depth,programs[i]);
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start); 
-        cout<<"duration took "<<duration.count()*0.000001<<" seconds ";
+        // cout<<"duration took "<<duration.count()*0.000001<<" seconds ";
         cout<<result<<endl;
     }
     // env.print_procedure_map();

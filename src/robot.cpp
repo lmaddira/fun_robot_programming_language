@@ -7,8 +7,17 @@ Robot::Robot()
     this->x = 0;
     this->y = 0;
     this->h = north;
+    this->rows = 0;
+    this->cols = 0;
 }
-void Robot::add_robot_location(int x,int y,char h)
+void Robot::initiate_grid(vector<char> &grid, int &rows, int &cols) 
+{
+    this->grid = grid;
+    this->rows = rows;
+    this->cols = cols;
+}
+
+void Robot::add_robot_location(int &x,int &y,char &h)
 {
     this->x = x-1;  //converting one indexing to zero indexing
     this->y = y-1;
@@ -24,21 +33,21 @@ char Robot::get_current_heading()
 }
 
 /* true if next state is blocked else false */
-bool Robot::isbarrier(const vector<vector<char>> &grid) 
+bool Robot::isbarrier() 
 {
     switch(h) // as output of m is dependent on h heading
     {
         case north:// if north check if grid has barrier
-            if(x-1>=0 && grid[x-1][y] !=blocked) return false; 
+            if(x-1>=0 && grid[(x-1 * cols) + y] !=blocked) return false; 
             break;
         case west:// if west
-            if(y-1>= 0 && grid[x][y-1] !=blocked) return false; 
+            if(y-1>= 0 && grid[(x*cols) + y-1] !=blocked) return false; 
             break;
         case south:// if south
-            if(x+1 < grid.size() && grid[x+1][y] !=blocked) return false; 
+            if(x+1 < rows && grid[(x+1 * cols) + y] !=blocked) return false; 
             break;
         case east:// if east
-            if(y+1 < grid[0].size() && grid[x][y+1] !=blocked)return false; 
+            if(y+1 < cols && grid[(x*cols) + y+1] !=blocked)return false; 
             break;
         default:
             std::cout<<"error in h heading \n";
@@ -47,12 +56,12 @@ bool Robot::isbarrier(const vector<vector<char>> &grid)
     return true;
 } 
 
-void Robot::robot_command_execution(char c, const vector<vector<char>> &grid) // expecting commands like m,l 
+void Robot::robot_command_execution(char &c) // expecting commands like m,l 
 {
     switch(c)// switch cases for m and l
     {
         case 'm': //if move
-            if(!isbarrier(grid))
+            if(!isbarrier())
             {
                 switch(h) // as output of m is dependent on h heading
                 {

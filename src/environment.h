@@ -8,7 +8,8 @@ using namespace std;
 class Environment{
 private:
     /* store grid */
-    vector<vector<char>> grid; 
+    // vector<vector<char>> grid; 
+    vector<char> grid;
     /*robot object */
     Robot r; 
     /* stores all procedures to execute later */
@@ -24,7 +25,7 @@ public:
     /* reads grid from console and stores it */
     void read_grid();
     /* assigns robot starting pose */
-    void initiate_robot(int x,int y,char heading); 
+    void initiate_robot(int &x,int &y,char &heading); 
     /* returns robot location as string "x y h" */
     string get_robot_location(); 
     /* add procedure definition to map of procedures */
@@ -39,15 +40,21 @@ public:
     void execute_until_clause(int &n,string &s, int &i); 
     /* execute the procedure, Inputs n - checks recursion deption and s-procedure call and return the final location of the robot as a string x y h */
     string execute_procedure(int &n, string &s);
-    /* visualise the grid */
-    void print_grid(); 
-    /* visualise the procedure definition input char c = procedure "X" */
-    void print_procedure(char &c); 
     /* converts robot state and procedure at that state to string */
     string convert_to_string(string &procedure);
     /* Input s - robot location "x y h"from the map of memory of robot procedures if we get a output string then we want to reset robot to that resultant state */
     void reset_robot_from_string(string &s); 
+    /** check if a program contains recursion 
+     * if the definition contain the same program name - if not then not a recursion- return false
+     * if yes then check if inside one of the if clause - then we might consider that as not recurion for now
+     * else return true for if recursion
+     * */
+    bool ifrecursion(char &c);
+    /* visualise the grid */
+    void print_grid(); 
+    /* visualise the procedure definition input char c = procedure "X" */
+    void print_procedure(char &c); 
     /* prints procedure map */
     void print_procedure_map(); 
-
+    
 };

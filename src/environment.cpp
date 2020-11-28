@@ -8,23 +8,19 @@ Environment::Environment(int &rows, int &cols){
     }
 
 void Environment::read_grid(){ // intitate env with information of number of rows and columns in the grid
-    grid.resize(rows);
-    for( int i= 0;i<rows;++i)
+    grid.resize(rows*cols);
+    for(int i = 0;i< rows*cols; ++i)
     {
-        grid[i].resize(cols);
-        for(int j =0;j<cols;++j)
-        {
-            cin>>grid[i][j];
-            
-        }
+        cin>>grid[i];
     }
+    r.initiate_grid(grid,rows,cols); // initiate grid in robot class as well
 }
 
-void Environment::initiate_robot(int x,int y,char heading){ // starts robot pose
+void Environment::initiate_robot(int &x,int &y,char &heading){ // assigns robot pose
     r.add_robot_location(x,y,heading); 
 }
 
-string Environment::get_robot_location() // get robot location
+string Environment::get_robot_location() // returns robot pose
 {
     return r.get_robot_location();
 }
@@ -32,6 +28,34 @@ string Environment::get_robot_location() // get robot location
 void Environment::add_procedure(string s){
     assert(s[0] >='A' && s[0]<='Z' && s[1]=='=');// asserting that procedure is capital letter 
     procedure[s[0]] = s.substr(2,s.length()-2);
+}
+
+bool Environment::ifrecursion(char &c)
+{
+    string description = procedure[c];
+    size_t found = description.find(c); // gives position of the 
+    if(found == string::npos)return false; // if same character is not found
+    // if found check if there is a if clause in the def
+    size_t found2 = description.find('i');
+    if(found2 == string::npos)return true; // if "if" clause is not found then true
+    int i = 0;
+    while (i<description.length())
+    {
+        while(i<description.length() && description[i] !='i' && description[i]!= c)++i;
+        if(description[i] == c )return true;
+        if(description[i] == 'i')
+        {
+            vector<string> conditions;
+            i +=2;
+            get_if_clause(description,conditions, i); // get if conditions 
+            size_t f1 = conditions[0].find(c);
+            size_t f2 = conditions[1].find(c);
+            if(f1 != string::npos && f2 != string::npos)return true; // if both conditions has value "X" then return true;
+
+        }
+    }
+    return false;
+     
 }
 
 void Environment::get_if_clause(string &s,vector<string> &conditions, int &i)
@@ -51,7 +75,6 @@ void Environment::get_if_clause(string &s,vector<string> &conditions, int &i)
             if(s[i] =='(')p_check.push(s[i]);
             else if (s[i] ==')')p_check.pop();
             cond +=s[i];
-            // std::cout<<"s "<<s[i]<<" cond "<<cond<<" p_check "<<p_check.size() <<" ";
             ++i;
         }
         cond.pop_back(); // poping back the last appended ')'
@@ -75,7 +98,6 @@ void Environment::get_until_clause(string &s, string &cond, int &i) // s should 
         ++i;
     }
     cond.pop_back(); // poping back the last appended ')'
-    // std::cout<<"cond "<<cond<<"\n";
     --i;
 }
 
@@ -85,12 +107,11 @@ void Environment::execute_if_clause(int &n,string &s, int &i) // this function i
     vector<string> conditions;
     char c = s[++i]; // condition for the if statement
     get_if_clause(s,conditions, ++i); // get if conditions 
-    // cout<<"conditions "<<conditions[0]<<" "<<conditions[1]<<"\n";
     // check the case
     switch(c) // if barrier,n,e,s,w
     {
         case barrier:
-            if(r.isbarrier(grid)) execute_procedure(--n,conditions[0]);
+            if(r.isbarrier()) execute_procedure(--n,conditions[0]);
             else execute_procedure(--n, conditions[1]);
             break;
         case north:
@@ -113,7 +134,6 @@ void Environment::execute_if_clause(int &n,string &s, int &i) // this function i
             std::cout<<"error in if clause\n";
             break;
     }
-    // return "Input error to execute_if_clause";
 
 }
 
@@ -126,7 +146,7 @@ void Environment::execute_until_clause(int &n,string &s, int &i) // this functio
     switch(c) // if barrier,n,e,s,w
     {
         case barrier:
-            while(n > 0 && !r.isbarrier(grid)) execute_procedure(--n, condition); // until this condition is true execute the procedure 
+            while(n > 0 && !r.isbarrier()) execute_procedure(--n, condition); // until this condition is true execute the procedure 
             break;
         case north:
             while(n > 0 && r.get_current_heading() != north) execute_procedure(--n, condition);
@@ -150,24 +170,21 @@ void Environment::execute_until_clause(int &n,string &s, int &i) // this functio
 string Environment::execute_procedure(int &n, string &s) // execute the procedure and return the final location of the robot as a string x y h
 {
     if(n <= 0 ) return "inf";
-    // cout<<" n "<<n<<"\n";
     // give robot specific commands like m and l only, process the rest of the conditions here
     string robot_state_nd_procedure =  convert_to_string(s);
     if(procedure_map.find(robot_state_nd_procedure) == procedure_map.end())
     {
         for(int i=0;i<s.length();++i)
         {
-            // cout<<"n "<<n<<"\n";
-            // std::cout<<"executing "<<s<<"at i "<<i<<"\n";
             if(procedure.find(s[i]) != procedure.end()) // if it's a defined procedure
             {
-                if(procedure[s[i]][0] == s[i]) return"inf";
+                if(ifrecursion(s[i])) return"inf";
                 execute_procedure(--n,procedure[s[i]]);
             }
             else if(s[i]=='m'|| s[i]=='l')
             {
                 --n;
-                r.robot_command_execution(s[i],grid); // if m or l just execute the action
+                r.robot_command_execution(s[i]); // if m or l just execute the action
             }
             else if(s[i]=='i')
             {
@@ -184,8 +201,8 @@ string Environment::execute_procedure(int &n, string &s) // execute the procedur
         }
     }else
     {
-        reset_robot_from_string(procedure_map[robot_state_nd_procedure]);
-        return procedure_map[robot_state_nd_procedure];
+        reset_robot_from_string(procedure_map[robot_state_nd_procedure]); // reset the robot to the output of this procedure
+        return procedure_map[robot_state_nd_procedure]; // return robot state
     }
     if(n <=0 )return "inf";
     procedure_map[robot_state_nd_procedure] = get_robot_location();
@@ -201,7 +218,6 @@ void Environment::reset_robot_from_string(string &s)
     int x = atoi(&s[0]);
     int y = atoi(&s[2]);
     char h = s[4];
-    // cout<<" string "<<s<<" x "<<x<<" y "<<y<<" h "<<h<<"\n";
     initiate_robot(x,y,h); // taking care of indexing difference
 }
 
@@ -211,7 +227,7 @@ void Environment::print_grid()
     {
         for(int j =0;j<cols;++j)
         {
-            std::cout<<grid[i][j];
+            std::cout<<grid[(i*cols) + j];
             
         }
         std::cout<< "\n";
