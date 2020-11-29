@@ -1,4 +1,4 @@
-# Fun robotics language
+# Fun robot programming language
 
 ### Problem description
 There is a robot which is located in a grid of unit squares. Some of the squares are free and some of the
